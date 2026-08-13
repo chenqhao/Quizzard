@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-browser';
-import { Warning, Check, ClipboardText, Envelope, Hourglass, Users, Handshake } from '@phosphor-icons/react';
+import { Warning } from '@phosphor-icons/react/dist/ssr/Warning';
+import { Check } from '@phosphor-icons/react/dist/ssr/Check';
+import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
+import { Envelope } from '@phosphor-icons/react/dist/ssr/Envelope';
+import { Hourglass } from '@phosphor-icons/react/dist/ssr/Hourglass';
+import { Users } from '@phosphor-icons/react/dist/ssr/Users';
+import { Handshake } from '@phosphor-icons/react/dist/ssr/Handshake';
 
 export default function FriendsPage() {
   const supabase = createClient();

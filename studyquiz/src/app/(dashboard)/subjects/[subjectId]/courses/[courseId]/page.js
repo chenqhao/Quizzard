@@ -6,7 +6,10 @@ import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import Link from 'next/link';
-import { SmileySad, CalendarBlank, Target, ClipboardText } from '@phosphor-icons/react';
+import { SmileySad } from '@phosphor-icons/react/dist/ssr/SmileySad';
+import { CalendarBlank } from '@phosphor-icons/react/dist/ssr/CalendarBlank';
+import { Target } from '@phosphor-icons/react/dist/ssr/Target';
+import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
 
 export default function CourseDetailPage({ params }) {
   const { subjectId, courseId } = use(params);

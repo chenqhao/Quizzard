@@ -3,7 +3,14 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Warning, Check, TrayArrowDown, EnvelopeOpen, TrayArrowUp, Tray, Target, RocketLaunch } from '@phosphor-icons/react';
+import { Warning } from '@phosphor-icons/react/dist/ssr/Warning';
+import { Check } from '@phosphor-icons/react/dist/ssr/Check';
+import { TrayArrowDown } from '@phosphor-icons/react/dist/ssr/TrayArrowDown';
+import { EnvelopeOpen } from '@phosphor-icons/react/dist/ssr/EnvelopeOpen';
+import { TrayArrowUp } from '@phosphor-icons/react/dist/ssr/TrayArrowUp';
+import { Tray } from '@phosphor-icons/react/dist/ssr/Tray';
+import { Target } from '@phosphor-icons/react/dist/ssr/Target';
+import { RocketLaunch } from '@phosphor-icons/react/dist/ssr/RocketLaunch';
 
 function InboxContent() {
   const supabase = createClient();

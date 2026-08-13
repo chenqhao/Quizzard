@@ -3,7 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useSearchParams } from 'next/navigation';
-import { Sparkle, CheckCircle, Check, ClipboardText, Lightbulb } from '@phosphor-icons/react';
+import { Sparkle } from '@phosphor-icons/react/dist/ssr/Sparkle';
+import { CheckCircle } from '@phosphor-icons/react/dist/ssr/CheckCircle';
+import { Check } from '@phosphor-icons/react/dist/ssr/Check';
+import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
+import { Lightbulb } from '@phosphor-icons/react/dist/ssr/Lightbulb';
 import { DifficultyBadge, TypeBadge } from '@/components/ui/Badge';
 
 function GeneratePageContent() {

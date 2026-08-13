@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import Link from 'next/link';
-import { Envelope, GraduationCap } from '@phosphor-icons/react';
+import { Envelope } from '@phosphor-icons/react/dist/ssr/Envelope';
+import { GraduationCap } from '@phosphor-icons/react/dist/ssr/GraduationCap';
 import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {

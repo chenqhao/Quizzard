@@ -3,7 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
-import { Warning, Check, Copy, Envelope, Moon, Sun, SignOut, UploadSimple, Lock, Eye, EyeSlash } from '@phosphor-icons/react';
+import { Warning } from '@phosphor-icons/react/dist/ssr/Warning';
+import { Check } from '@phosphor-icons/react/dist/ssr/Check';
+import { Copy } from '@phosphor-icons/react/dist/ssr/Copy';
+import { Envelope } from '@phosphor-icons/react/dist/ssr/Envelope';
+import { Moon } from '@phosphor-icons/react/dist/ssr/Moon';
+import { Sun } from '@phosphor-icons/react/dist/ssr/Sun';
+import { SignOut } from '@phosphor-icons/react/dist/ssr/SignOut';
+import { UploadSimple } from '@phosphor-icons/react/dist/ssr/UploadSimple';
+import { Lock } from '@phosphor-icons/react/dist/ssr/Lock';
+import { Eye } from '@phosphor-icons/react/dist/ssr/Eye';
+import { EyeSlash } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 
 const icons = {
   copy: <Copy size={16} />,

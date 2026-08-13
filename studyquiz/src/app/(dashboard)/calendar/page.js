@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase-browser';
-import { Target, BookOpen } from '@phosphor-icons/react';
+import { Target } from '@phosphor-icons/react/dist/ssr/Target';
+import { BookOpen } from '@phosphor-icons/react/dist/ssr/BookOpen';
 
 // ── helpers ──────────────────────────────────────────────────
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];

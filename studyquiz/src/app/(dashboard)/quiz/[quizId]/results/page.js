@@ -4,7 +4,20 @@ import { useState, useEffect, use } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import Link from 'next/link';
 import { TypeBadge, DifficultyBadge } from '@/components/ui/Badge';
-import { Confetti, ThumbsUp, Books, Barbell, TrayArrowUp, Link as LinkIcon, Check, ClipboardText, Sparkle, X, Robot, Lightbulb, Notepad, CheckCircle } from '@phosphor-icons/react';
+import { Confetti } from '@phosphor-icons/react/dist/ssr/Confetti';
+import { ThumbsUp } from '@phosphor-icons/react/dist/ssr/ThumbsUp';
+import { Books } from '@phosphor-icons/react/dist/ssr/Books';
+import { Barbell } from '@phosphor-icons/react/dist/ssr/Barbell';
+import { TrayArrowUp } from '@phosphor-icons/react/dist/ssr/TrayArrowUp';
+import { Link as LinkIcon } from '@phosphor-icons/react/dist/ssr/Link';
+import { Check } from '@phosphor-icons/react/dist/ssr/Check';
+import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
+import { Sparkle } from '@phosphor-icons/react/dist/ssr/Sparkle';
+import { X } from '@phosphor-icons/react/dist/ssr/X';
+import { Robot } from '@phosphor-icons/react/dist/ssr/Robot';
+import { Lightbulb } from '@phosphor-icons/react/dist/ssr/Lightbulb';
+import { Notepad } from '@phosphor-icons/react/dist/ssr/Notepad';
+import { CheckCircle } from '@phosphor-icons/react/dist/ssr/CheckCircle';
 
 function formatTime(seconds) {
   if (!seconds || seconds === 0) return null;

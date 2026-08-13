@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef, useCallback, use } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
-import { Warning, Check, Timer, CheckSquare } from '@phosphor-icons/react';
+import { Warning } from '@phosphor-icons/react/dist/ssr/Warning';
+import { Check } from '@phosphor-icons/react/dist/ssr/Check';
+import { Timer } from '@phosphor-icons/react/dist/ssr/Timer';
+import { CheckSquare } from '@phosphor-icons/react/dist/ssr/CheckSquare';
 import { TypeBadge, DifficultyBadge } from '@/components/ui/Badge';
 
 export default function ActiveQuizPage({ params }) {

@@ -7,7 +7,13 @@ import EmptyState from '@/components/ui/EmptyState';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { Badge, DifficultyBadge, TypeBadge, MasteryBadge } from '@/components/ui/Badge';
 import Link from 'next/link';
-import { SmileySad, Target, Sparkle, Question, Check, Notepad, PencilSimple } from '@phosphor-icons/react';
+import { SmileySad } from '@phosphor-icons/react/dist/ssr/SmileySad';
+import { Target } from '@phosphor-icons/react/dist/ssr/Target';
+import { Sparkle } from '@phosphor-icons/react/dist/ssr/Sparkle';
+import { Question } from '@phosphor-icons/react/dist/ssr/Question';
+import { Check } from '@phosphor-icons/react/dist/ssr/Check';
+import { Notepad } from '@phosphor-icons/react/dist/ssr/Notepad';
+import { PencilSimple } from '@phosphor-icons/react/dist/ssr/PencilSimple';
 
 export default function UnitDetailPage({ params }) {
   const { subjectId, courseId, unitId } = use(params);

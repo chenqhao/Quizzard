@@ -3,7 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Target, Timer } from '@phosphor-icons/react';
+import { Target } from '@phosphor-icons/react/dist/ssr/Target';
+import { Timer } from '@phosphor-icons/react/dist/ssr/Timer';
 
 function QuizStartContent() {
   const supabase = createClient();

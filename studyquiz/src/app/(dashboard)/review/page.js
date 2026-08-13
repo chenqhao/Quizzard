@@ -5,7 +5,10 @@ import { createClient } from '@/lib/supabase-browser';
 import { TypeBadge, DifficultyBadge, MasteryBadge } from '@/components/ui/Badge';
 import EmptyState from '@/components/ui/EmptyState';
 import Link from 'next/link';
-import { ArrowsClockwise, MagnifyingGlass, Check, Lightbulb } from '@phosphor-icons/react';
+import { ArrowsClockwise } from '@phosphor-icons/react/dist/ssr/ArrowsClockwise';
+import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
+import { Check } from '@phosphor-icons/react/dist/ssr/Check';
+import { Lightbulb } from '@phosphor-icons/react/dist/ssr/Lightbulb';
 
 export default function ReviewPage() {
   const supabase = createClient();

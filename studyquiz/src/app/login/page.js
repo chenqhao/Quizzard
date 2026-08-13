@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
 import Link from 'next/link';
-import { Envelope, ArrowLeft } from '@phosphor-icons/react';
+import { Envelope } from '@phosphor-icons/react/dist/ssr/Envelope';
+import { ArrowLeft } from '@phosphor-icons/react/dist/ssr/ArrowLeft';
 import DotField from '@/components/ui/DotField';
 
 export default function Login() {

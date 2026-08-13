@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { createClient } from '@/lib/supabase-browser';
-import { Fire, CalendarBlank, CheckCircle, Target, Timer, ChartBar, TrendUp, Books } from '@phosphor-icons/react';
+import { Fire } from '@phosphor-icons/react/dist/ssr/Fire';
+import { CalendarBlank } from '@phosphor-icons/react/dist/ssr/CalendarBlank';
+import { CheckCircle } from '@phosphor-icons/react/dist/ssr/CheckCircle';
+import { Target } from '@phosphor-icons/react/dist/ssr/Target';
+import { Timer } from '@phosphor-icons/react/dist/ssr/Timer';
+import { ChartBar } from '@phosphor-icons/react/dist/ssr/ChartBar';
+import { TrendUp } from '@phosphor-icons/react/dist/ssr/TrendUp';
+import { Books } from '@phosphor-icons/react/dist/ssr/Books';
 
 // ── Helpers ──────────────────────────────────────────────────────
 function formatTime(seconds) {

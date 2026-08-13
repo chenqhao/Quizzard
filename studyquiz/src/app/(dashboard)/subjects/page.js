@@ -5,7 +5,21 @@ import { createClient } from '@/lib/supabase-browser';
 import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Link from 'next/link';
-import { Books, Calculator, Microscope, Dna, Palette, Bank, Laptop, Globe, Strategy, MusicNotes, Scales, Briefcase, Brain, ChartBar, Wrench } from '@phosphor-icons/react';
+import { Books } from '@phosphor-icons/react/dist/ssr/Books';
+import { Calculator } from '@phosphor-icons/react/dist/ssr/Calculator';
+import { Microscope } from '@phosphor-icons/react/dist/ssr/Microscope';
+import { Dna } from '@phosphor-icons/react/dist/ssr/Dna';
+import { Palette } from '@phosphor-icons/react/dist/ssr/Palette';
+import { Bank } from '@phosphor-icons/react/dist/ssr/Bank';
+import { Laptop } from '@phosphor-icons/react/dist/ssr/Laptop';
+import { Globe } from '@phosphor-icons/react/dist/ssr/Globe';
+import { Strategy } from '@phosphor-icons/react/dist/ssr/Strategy';
+import { MusicNotes } from '@phosphor-icons/react/dist/ssr/MusicNotes';
+import { Scales } from '@phosphor-icons/react/dist/ssr/Scales';
+import { Briefcase } from '@phosphor-icons/react/dist/ssr/Briefcase';
+import { Brain } from '@phosphor-icons/react/dist/ssr/Brain';
+import { ChartBar } from '@phosphor-icons/react/dist/ssr/ChartBar';
+import { Wrench } from '@phosphor-icons/react/dist/ssr/Wrench';
 
 const COLORS = ['#6366f1', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6'];
 

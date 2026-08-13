@@ -6,7 +6,9 @@ import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import Link from 'next/link';
-import { SmileySad, Book, CalendarBlank } from '@phosphor-icons/react';
+import { SmileySad } from '@phosphor-icons/react/dist/ssr/SmileySad';
+import { Book } from '@phosphor-icons/react/dist/ssr/Book';
+import { CalendarBlank } from '@phosphor-icons/react/dist/ssr/CalendarBlank';
 import { renderIcon } from '@/lib/icons';
 
 export default function SubjectDetailPage({ params }) {

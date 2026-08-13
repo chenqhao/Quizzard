@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-browser';
-import { ChartBar, CheckCircle, Timer, Medal, Trophy } from '@phosphor-icons/react';
+import { ChartBar } from '@phosphor-icons/react/dist/ssr/ChartBar';
+import { CheckCircle } from '@phosphor-icons/react/dist/ssr/CheckCircle';
+import { Timer } from '@phosphor-icons/react/dist/ssr/Timer';
+import { Medal } from '@phosphor-icons/react/dist/ssr/Medal';
+import { Trophy } from '@phosphor-icons/react/dist/ssr/Trophy';
 
 const TABS = [
   { key: 'completed', label: 'Questions Completed', icon: <ChartBar weight="fill" size={20} />, description: 'Total questions attempted' },
