@@ -13,12 +13,24 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      try {
+        // Try fast local session check first (reads from cookie, no network call)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUser(session.user);
+          return;
+        }
+        // Fallback to server verification
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) {
+          router.push('/login');
+          return;
+        }
+        setUser(user);
+      } catch (err) {
+        console.error('Auth check failed:', err);
         router.push('/login');
-        return;
       }
-      setUser(user);
     };
     getUser();
 
