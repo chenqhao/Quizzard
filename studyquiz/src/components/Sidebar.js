@@ -497,7 +497,7 @@ export default function Sidebar({ user }) {
     </aside>
 
     {/* Add Class Modal */}
-    <Modal isOpen={addClassOpen} onClose={() => setAddClassOpen(false)} title="New Subject">
+    <Modal isOpen={addClassOpen} onClose={() => setAddClassOpen(false)} title="New Subject" opaque={true}>
       <div className="space-y-5">
         <div>
           <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>Subject Name</label>

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-export default function Modal({ isOpen, onClose, title, children, size = 'md' }) {
+export default function Modal({ isOpen, onClose, title, children, size = 'md', opaque = true }) {
   const [mounted, setMounted] = useState(false);
   const modalRef = useRef(null);
 
@@ -45,7 +45,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
       {/* HIG Sheet Modal Panel */}
       <div
         ref={modalRef}
-        className={`glass-modal-panel w-full ${sizeClasses[size]} rounded-[28px] overflow-hidden relative z-10 animate-slide-up mx-4 sm:mx-6 flex flex-col`}
+        className={`${opaque ? 'bg-[var(--background)] border border-[var(--border)]' : 'glass-modal-panel'} w-full ${sizeClasses[size]} rounded-[28px] overflow-hidden relative z-10 animate-slide-up mx-4 sm:mx-6 flex flex-col`}
         style={{
           boxShadow: 'var(--specular-inner), var(--shadow-xl), 0 24px 64px rgba(0,0,0,0.12)',
           maxHeight: '96vh',

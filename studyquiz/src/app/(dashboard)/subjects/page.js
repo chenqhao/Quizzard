@@ -237,7 +237,7 @@ export default function SubjectsPage() {
       )}
 
       {/* Modal */}
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editingSubject ? 'Edit Subject' : 'New Subject'}>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editingSubject ? 'Edit Subject' : 'New Subject'} opaque={true}>
         <div className="space-y-5">
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>Subject Name</label>
