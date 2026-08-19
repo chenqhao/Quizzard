@@ -50,6 +50,6 @@ const ICON_MAP = {
 export const ICONS = ['Books', 'Calculator', 'Microscope', 'Dna', 'Palette', 'Bank', 'Laptop', 'Globe', 'Strategy', 'MusicNotes', 'Scales', 'Briefcase', 'Brain', 'ChartBar', 'Wrench'];
 
 export function renderIcon(iconName) {
-  const IconComponent = ICON_MAP[iconName] || Books;
+  const IconComponent = ICON_MAP[iconName] || BooksIcon;
   return <IconComponent weight="fill" />;
 }

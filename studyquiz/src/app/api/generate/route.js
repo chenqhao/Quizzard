@@ -10,13 +10,14 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Notes are required' }, { status: 400 });
     }
 
-    if (!count || count < 1 || count > 20) {
+    const parsedCount = parseInt(count, 10);
+    if (!parsedCount || isNaN(parsedCount) || parsedCount < 1 || parsedCount > 20) {
       return NextResponse.json({ error: 'Count must be between 1 and 20' }, { status: 400 });
     }
 
     const questions = await generateQuestions({
       notes: notes.trim(),
-      count: Math.min(count, 20),
+      count: Math.min(parsedCount, 20),
       type: type || 'mixed',
       difficulty: difficulty || 'medium',
     });
