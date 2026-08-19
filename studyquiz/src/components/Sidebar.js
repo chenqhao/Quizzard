@@ -4,6 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
+import Modal from '@/components/ui/Modal';
+import { ICONS, renderIcon } from '@/lib/icons';
+
+const COLORS = ['#6366f1', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6'];
 
 // SVG icon components — SF Symbols Medium weight (1.5px stroke)
 const icons = {
@@ -114,6 +118,9 @@ export default function Sidebar({ user }) {
   const [subjects, setSubjects] = useState([]);
   const [expanded, setExpanded] = useState({});
   const [unreadCount, setUnreadCount] = useState(0);
+  const [addClassOpen, setAddClassOpen] = useState(false);
+  const [classForm, setClassForm] = useState({ name: '', color: COLORS[0], icon: ICONS[0] });
+  const [savingClass, setSavingClass] = useState(false);
 
   // Load collapsed state from localStorage
   useEffect(() => {
@@ -174,6 +181,27 @@ export default function Sidebar({ user }) {
 
   const isActive = (path) => pathname === path;
 
+  const openAddClass = () => {
+    setClassForm({ name: '', color: COLORS[Math.floor(Math.random() * COLORS.length)], icon: ICONS[0] });
+    setAddClassOpen(true);
+  };
+
+  const handleSaveClass = async () => {
+    if (!classForm.name.trim()) return;
+    setSavingClass(true);
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    await supabase.from('subjects').insert({
+      name: classForm.name.trim(),
+      color: classForm.color,
+      icon: classForm.icon,
+      user_id: authUser.id,
+    });
+    setSavingClass(false);
+    setAddClassOpen(false);
+    loadSubjects();
+    window.dispatchEvent(new Event('sidebar-refresh'));
+  };
+
   // Main navigation items
   const mainNav = [
     { href: '/', icon: icons.home, label: 'Home' },
@@ -193,6 +221,7 @@ export default function Sidebar({ user }) {
   const sidebarWidth = collapsed ? 68 : 244;
 
   return (
+    <>
     <aside
       className="sidebar-container"
       style={{
@@ -380,6 +409,37 @@ export default function Sidebar({ user }) {
           ))}
         </div>
 
+        {/* Quick add class button */}
+        <div className="px-2.5 mt-1">
+          <button
+            onClick={openAddClass}
+            id="sidebar-add-class-btn"
+            className="w-full sidebar-nav-item flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer depth-press group"
+            style={{
+              padding: collapsed ? '10px 0' : '8px 12px',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              color: 'var(--muted-foreground)',
+              background: 'transparent',
+              border: 'none',
+            }}
+            title={collapsed ? 'Add Class' : undefined}
+          >
+            <span
+              className="flex-shrink-0 w-5 h-5 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+              style={{
+                background: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                color: 'var(--primary)',
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </span>
+            {!collapsed && <span className="truncate transition-colors duration-200 group-hover:text-[var(--primary)]">Add Class</span>}
+          </button>
+        </div>
+
         {/* Divider */}
         <div className="mx-4 my-3" style={{ borderTop: '0.5px solid var(--sidebar-border)' }} />
 
@@ -435,5 +495,82 @@ export default function Sidebar({ user }) {
         )}
       </div>
     </aside>
+
+    {/* Add Class Modal */}
+    <Modal isOpen={addClassOpen} onClose={() => setAddClassOpen(false)} title="New Subject">
+      <div className="space-y-5">
+        <div>
+          <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>Subject Name</label>
+          <input
+            id="sidebar-subject-name-input"
+            value={classForm.name}
+            onChange={(e) => setClassForm({ ...classForm, name: e.target.value })}
+            onKeyDown={(e) => e.key === 'Enter' && classForm.name.trim() && handleSaveClass()}
+            placeholder="e.g., Mathematics"
+            className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all"
+            style={{ background: 'var(--muted)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+            autoFocus
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>Icon</label>
+          <div className="flex flex-wrap gap-2">
+            {ICONS.map((icon) => (
+              <button
+                key={icon}
+                type="button"
+                onClick={() => setClassForm({ ...classForm, icon })}
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all border"
+                style={{
+                  borderColor: classForm.icon === icon ? 'var(--primary)' : 'var(--border)',
+                  background: classForm.icon === icon ? 'color-mix(in srgb, var(--primary) 10%, transparent)' : 'var(--muted)',
+                }}
+              >
+                {renderIcon(icon)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>Color</label>
+          <div className="flex flex-wrap gap-2">
+            {COLORS.map((color) => (
+              <button
+                key={color}
+                type="button"
+                onClick={() => setClassForm({ ...classForm, color })}
+                className="w-8 h-8 rounded-full transition-all"
+                style={{
+                  background: color,
+                  boxShadow: classForm.color === color ? `0 0 0 3px var(--background), 0 0 0 5px ${color}` : 'none',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button
+            onClick={() => setAddClassOpen(false)}
+            className="px-5 py-2.5 rounded-xl text-sm font-medium transition-colors"
+            style={{ color: 'var(--muted-foreground)' }}
+          >
+            Cancel
+          </button>
+          <button
+            id="sidebar-save-subject-btn"
+            onClick={handleSaveClass}
+            disabled={savingClass || !classForm.name.trim()}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover-lift disabled:opacity-50"
+            style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
+          >
+            {savingClass ? 'Saving...' : 'Create'}
+          </button>
+        </div>
+      </div>
+    </Modal>
+    </>
   );
 }
