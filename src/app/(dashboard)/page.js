@@ -51,19 +51,39 @@ export default function Dashboard() {
         });
 
         if (quizzesRes.data && quizzesRes.data.length > 0) {
-          const quizIds = [...new Set(quizzesRes.data.map(q => q.quiz_id))];
-          const { data: quizDetails } = await supabase
-            .from('quizzes')
-            .select('id, title, target_type, target_id')
-            .in('id', quizIds);
+          // Fetch related names for each attempt's scope
+          const unitIds = [...new Set(quizzesRes.data.filter(q => q.unit_id).map(q => q.unit_id))];
+          const courseIds = [...new Set(quizzesRes.data.filter(q => q.course_id).map(q => q.course_id))];
+          const subjectIds = [...new Set(quizzesRes.data.filter(q => q.subject_id).map(q => q.subject_id))];
 
-          const quizzesMap = {};
-          quizDetails?.forEach(q => { quizzesMap[q.id] = q; });
+          const [unitsRes, coursesRes, subjectsRes] = await Promise.all([
+            unitIds.length > 0 ? supabase.from('units').select('id, title').in('id', unitIds) : { data: [] },
+            courseIds.length > 0 ? supabase.from('courses').select('id, name, course_code').in('id', courseIds) : { data: [] },
+            subjectIds.length > 0 ? supabase.from('subjects').select('id, name').in('id', subjectIds) : { data: [] },
+          ]);
 
-          const mapped = quizzesRes.data.map(attempt => ({
-            ...attempt,
-            quiz: quizzesMap[attempt.quiz_id] || { title: 'Unknown Quiz' }
-          }));
+          const unitsMap = {};
+          unitsRes.data?.forEach(u => { unitsMap[u.id] = u; });
+          const coursesMap = {};
+          coursesRes.data?.forEach(c => { coursesMap[c.id] = c; });
+          const subjectsMap = {};
+          subjectsRes.data?.forEach(s => { subjectsMap[s.id] = s; });
+
+          const mapped = quizzesRes.data.map(attempt => {
+            let title = 'Quiz';
+            if (attempt.scope === 'unit' && unitsMap[attempt.unit_id]) {
+              title = unitsMap[attempt.unit_id].title;
+            } else if (attempt.scope === 'course' && coursesMap[attempt.course_id]) {
+              const c = coursesMap[attempt.course_id];
+              title = c.course_code || c.name;
+            } else if (attempt.scope === 'subject' && subjectsMap[attempt.subject_id]) {
+              title = subjectsMap[attempt.subject_id].name;
+            }
+            return {
+              ...attempt,
+              quiz: { title }
+            };
+          });
 
           setRecentQuizzes(mapped);
         }
@@ -258,15 +278,6 @@ export default function Dashboard() {
         <div className="bento-card rounded-[32px] p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="type-title2">Recent Quizzes</h2>
-            {recentQuizzes.length > 0 && (
-              <Link
-                href="/review"
-                className="type-footnote font-semibold transition-colors hover:underline"
-                style={{ color: 'var(--primary)' }}
-              >
-                See all
-              </Link>
-            )}
           </div>
 
           {recentQuizzes.length === 0 ? (
@@ -324,15 +335,6 @@ export default function Dashboard() {
         <div className="bento-card rounded-[32px] p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="type-title2">Needs Attention</h2>
-            {weakUnits.length > 0 && (
-              <Link
-                href="/review"
-                className="type-footnote font-semibold transition-colors hover:underline"
-                style={{ color: 'var(--danger)' }}
-              >
-                Study Now
-              </Link>
-            )}
           </div>
 
           {weakUnits.length === 0 ? (
