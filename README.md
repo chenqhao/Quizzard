@@ -10,7 +10,7 @@ access here: https://quizzard-nu.vercel.app/
 - React 
 - Tailwind CSS
 - Supabase
-- Gemini api 
+- Gemini API 
 - Node.js 
 
 ## Features
