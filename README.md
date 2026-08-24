@@ -43,9 +43,9 @@ A quiz web app allowing student to create their own quizzes, tracks progress and
 - Spotlight search system
 - Ctrt/Command-k hotkey 
 
+### License
 
-
-
+- Private project, not for redistribution 
 
 
 
