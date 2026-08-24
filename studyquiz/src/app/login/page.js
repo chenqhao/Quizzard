@@ -65,10 +65,10 @@ export default function Login() {
           bulgeStrength={67}
           glowRadius={160}
           sparkle={false}
-          waveAmplitude={0}
-          gradientFrom="rgba(0, 122, 255, 0.6)"
-          gradientTo="rgba(88, 86, 214, 0.45)"
-          glowColor="#0a0a0f"
+          waveAmplitude={5}
+          gradientFrom="rgba(0, 122, 255, 1)"
+          gradientTo="rgba(88, 86, 214, 1)"
+          glowColor="rgba(255, 255, 255, 1)"
         />
       </div>
 

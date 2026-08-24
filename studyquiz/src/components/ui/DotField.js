@@ -224,7 +224,7 @@ const DotField = memo(({
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -255,7 +255,7 @@ const DotField = memo(({
         <defs>
           <radialGradient id={glowId}>
             <stop offset="0%" stopColor={glowColor} />
-            <stop offset="100%" stopColor="transparent" />
+            <stop offset="100%" stopColor={glowColor} stopOpacity="0" />
           </radialGradient>
         </defs>
         <circle
