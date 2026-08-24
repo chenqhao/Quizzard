@@ -2,6 +2,7 @@
 
 A quiz web app allowing student to create their own quizzes, tracks progress and generate problems via the Gemini API
 <img width="1438" height="705" alt="Screenshot 2026-08-24 at 1 03 53 AM" src="https://github.com/user-attachments/assets/7130e7b4-7436-4702-9fb9-86d0344cbad7" />
+access here: https://quizzard-nu.vercel.app/
 
 ## Techstack
 
