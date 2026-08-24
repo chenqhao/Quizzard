@@ -68,23 +68,26 @@ export default function Dashboard() {
           setRecentQuizzes(mapped);
         }
 
-        // Load weak units
+        // Load weak units — only use the most recent attempt per unit
         const { data: attempts } = await supabase
           .from('quiz_attempts')
-          .select('unit_id, score, total_questions')
-          .not('unit_id', 'is', null);
+          .select('unit_id, score, total_questions, completed_at')
+          .not('unit_id', 'is', null)
+          .order('completed_at', { ascending: false });
 
         if (attempts && attempts.length > 0) {
+          // Since attempts are sorted newest-first, the first one we see per unit is the latest
           const unitScores = {};
           attempts.forEach((a) => {
-            if (!unitScores[a.unit_id]) unitScores[a.unit_id] = { total: 0, correct: 0, count: 0 };
-            unitScores[a.unit_id].total += a.total_questions;
-            unitScores[a.unit_id].correct += a.score;
-            unitScores[a.unit_id].count += 1;
+            if (!unitScores[a.unit_id]) {
+              const pct = a.total_questions > 0 ? (a.score / a.total_questions) * 100 : 0;
+              unitScores[a.unit_id] = { pct };
+            }
           });
 
           const weakIds = Object.entries(unitScores)
-            .map(([id, s]) => ({ id, avg: s.total > 0 ? (s.correct / s.total) * 100 : 0 }))
+            .map(([id, s]) => ({ id, avg: s.pct }))
+            .filter((u) => u.avg < 100)
             .sort((a, b) => a.avg - b.avg)
             .slice(0, 3);
 
@@ -357,23 +360,28 @@ export default function Dashboard() {
                       <p className="type-subhead font-semibold">{unit.title}</p>
                       <p className="type-caption1 mt-0.5" style={{ color: 'var(--muted-foreground)' }}>{unit.courseName}</p>
                     </div>
-                    <span
-                      className="type-footnote font-bold px-2.5 py-1 rounded-xl"
-                      style={{
-                        color: unit.avg < 50 ? 'var(--danger)' : 'var(--warning)',
-                        background: `color-mix(in srgb, ${unit.avg < 50 ? 'var(--danger)' : 'var(--warning)'} 15%, transparent)`,
-                        border: `0.5px solid color-mix(in srgb, ${unit.avg < 50 ? 'var(--danger)' : 'var(--warning)'} 30%, transparent)`,
-                      }}
-                    >
-                      {Math.round(unit.avg)}%
-                    </span>
+                    {(() => {
+                      const scoreColor = unit.avg >= 75 ? 'var(--success)' : unit.avg >= 50 ? 'var(--warning)' : 'var(--danger)';
+                      return (
+                        <span
+                          className="type-footnote font-bold px-2.5 py-1 rounded-xl"
+                          style={{
+                            color: scoreColor,
+                            background: `color-mix(in srgb, ${scoreColor} 15%, transparent)`,
+                            border: `0.5px solid color-mix(in srgb, ${scoreColor} 30%, transparent)`,
+                          }}
+                        >
+                          {Math.round(unit.avg)}%
+                        </span>
+                      );
+                    })()}
                   </div>
                   <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--glass-thick-border)' }}>
                     <div
                       className="h-full rounded-full transition-all duration-700 ease-out"
                       style={{
                         width: `${unit.avg}%`,
-                        background: unit.avg < 50 ? 'var(--danger)' : 'var(--warning)',
+                        background: unit.avg >= 75 ? 'var(--success)' : unit.avg >= 50 ? 'var(--warning)' : 'var(--danger)',
                       }}
                     />
                   </div>
