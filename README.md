@@ -44,7 +44,7 @@ access here: https://quizzard-nu.vercel.app/
 - Spotlight search system
 - Ctrt/Command-k hotkey 
 
-### License
+## License
 
 - Private project, not for redistribution 
 
