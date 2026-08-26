@@ -8,6 +8,8 @@ import { CheckCircle } from '@phosphor-icons/react/dist/ssr/CheckCircle';
 import { Check } from '@phosphor-icons/react/dist/ssr/Check';
 import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
 import { Lightbulb } from '@phosphor-icons/react/dist/ssr/Lightbulb';
+import { File as FileIcon } from '@phosphor-icons/react/dist/ssr/File';
+import { X } from '@phosphor-icons/react/dist/ssr/X';
 import { DifficultyBadge, TypeBadge } from '@/components/ui/Badge';
 
 function GeneratePageContent() {
@@ -29,6 +31,52 @@ function GeneratePageContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useState(null);
+
+  const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'application/pdf'];
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
+  const MAX_FILES = 5;
+
+  const addFiles = (newFiles) => {
+    const validFiles = [];
+    for (const file of newFiles) {
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        setError(`Unsupported file type: ${file.name}. Use images or PDFs.`);
+        continue;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setError(`File too large: ${file.name}. Max 10MB per file.`);
+        continue;
+      }
+      if (files.length + validFiles.length >= MAX_FILES) {
+        setError(`Maximum ${MAX_FILES} files allowed.`);
+        break;
+      }
+      validFiles.push(file);
+    }
+    if (validFiles.length > 0) {
+      setFiles((prev) => [...prev, ...validFiles]);
+    }
+  };
+
+  const removeFile = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // reader.result is "data:<mimeType>;base64,<data>", we just want the data part
+        const base64 = reader.result.split(',')[1];
+        resolve({ data: base64, mimeType: file.type, name: file.name });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   useEffect(() => {
     loadSubjects();
@@ -60,17 +108,21 @@ function GeneratePageContent() {
   };
 
   const handleGenerate = async () => {
-    if (!notes.trim() || !selectedUnit) return;
+    if (!notes.trim() && files.length === 0) return;
+    if (!selectedUnit) return;
     setGenerating(true);
     setError(null);
     setGeneratedQuestions([]);
     setSaved(false);
 
     try {
+      // Convert files to base64
+      const filePayloads = await Promise.all(files.map(fileToBase64));
+
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notes, count, type, difficulty }),
+        body: JSON.stringify({ notes, count, type, difficulty, files: filePayloads }),
       });
 
       if (!res.ok) {
@@ -137,7 +189,7 @@ function GeneratePageContent() {
           <Sparkle weight="fill" size={32} className="mr-2 text-[var(--primary)]" />AI Question Generator
         </h1>
         <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>
-          Paste your class notes and let AI create quiz questions for you
+          Paste your class notes or upload files and let AI create quiz questions for you
         </p>
       </div>
 
@@ -185,12 +237,84 @@ function GeneratePageContent() {
           id="notes-input"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Paste your class notes, textbook content, or lecture summaries here. The AI will generate questions based only on this content..."
+          placeholder="Paste your class notes, textbook content, or lecture summaries here..."
           rows={10}
           className="w-full px-4 py-3 rounded-xl border text-sm outline-none resize-y"
           style={{ background: 'var(--muted)', borderColor: 'var(--border)', color: 'var(--foreground)', minHeight: '200px' }}
         />
         <p className="text-xs mt-2" style={{ color: 'var(--muted-foreground)' }}>{notes.length} characters</p>
+      </div>
+
+      {/* File Upload */}
+      <div className="rounded-2xl border p-6" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+        <h2 className="text-sm font-bold mb-3" style={{ color: 'var(--foreground)' }}>Upload Files <span className="font-normal" style={{ color: 'var(--muted-foreground)' }}>(optional)</span></h2>
+        <div
+          onDrop={(e) => { e.preventDefault(); setDragOver(false); addFiles(Array.from(e.dataTransfer.files)); }}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onClick={() => document.getElementById('file-upload-input')?.click()}
+          className="rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-all"
+          style={{
+            borderColor: dragOver ? 'var(--primary)' : 'var(--border)',
+            background: dragOver ? 'color-mix(in srgb, var(--primary) 5%, transparent)' : 'var(--muted)',
+          }}
+        >
+          <input
+            id="file-upload-input"
+            type="file"
+            accept="image/*,.pdf"
+            multiple
+            className="hidden"
+            onChange={(e) => { addFiles(Array.from(e.target.files)); e.target.value = ''; }}
+          />
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2" style={{ color: 'var(--muted-foreground)' }}>
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <p className="text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            Drop files here or <span style={{ color: 'var(--primary)' }}>click to browse</span>
+          </p>
+          <p className="text-xs mt-1" style={{ color: 'var(--muted-foreground)', opacity: 0.7 }}>
+            Images, PDFs — up to 10MB each, max {MAX_FILES} files
+          </p>
+        </div>
+
+        {/* File Previews */}
+        {files.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-4">
+            {files.map((file, i) => (
+              <div
+                key={i}
+                className="relative group flex items-center gap-2 px-3 py-2 rounded-xl border text-xs"
+                style={{ background: 'var(--muted)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+              >
+                {file.type.startsWith('image/') ? (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                    className="w-10 h-10 object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}>
+                    <FileIcon weight="fill" size={20} className="text-[var(--primary)]" />
+                  </div>
+                )}
+                <div className="max-w-[120px]">
+                  <p className="font-medium truncate">{file.name}</p>
+                  <p style={{ color: 'var(--muted-foreground)' }}>{(file.size / 1024).toFixed(0)} KB</p>
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); removeFile(i); }}
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ background: 'var(--danger)', color: '#fff' }}
+                >
+                  <X weight="bold" size={10} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Options */}
@@ -239,7 +363,7 @@ function GeneratePageContent() {
       <button
         id="generate-btn"
         onClick={handleGenerate}
-        disabled={generating || !notes.trim() || !selectedUnit}
+        disabled={generating || (!notes.trim() && files.length === 0) || !selectedUnit}
         className="w-full py-4 rounded-2xl text-sm font-bold transition-all hover-lift disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         style={{ background: generating ? 'var(--muted)' : 'linear-gradient(135deg, var(--primary), var(--secondary))', color: generating ? 'var(--muted-foreground)' : '#fff' }}
       >

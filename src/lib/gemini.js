@@ -4,17 +4,27 @@
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
-async function callGemini(prompt) {
+/**
+ * Call Gemini API with text or multimodal content.
+ * @param {string|Array} promptOrParts - Either a text string or an array of content parts
+ *   Parts can be: { text: "..." } or { inlineData: { mimeType: "...", data: "base64..." } }
+ */
+async function callGemini(promptOrParts) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not configured');
   }
 
+  // Normalize: if a plain string is passed, wrap it as a text part
+  const parts = typeof promptOrParts === 'string'
+    ? [{ text: promptOrParts }]
+    : promptOrParts;
+
   const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
+      contents: [{ parts }],
       generationConfig: {
         temperature: 0.7,
         topP: 0.9,
@@ -42,24 +52,49 @@ async function callGemini(prompt) {
 /**
  * Generate quiz questions from class notes.
  */
-export async function generateQuestions({ notes, count, type, difficulty }) {
+export async function generateQuestions({ notes, count, type, difficulty, files }) {
   const typeInstruction = type === 'mixed'
     ? 'Generate a mix of multiple_choice and written questions.'
     : `Generate only ${type} questions.`;
 
-  const prompt = `You are an expert educational quiz generator. Generate exactly ${count} quiz questions based ONLY on the following class notes. Do NOT make up information that is not in the notes.
+  const hasFiles = files && files.length > 0;
+  const hasNotes = notes && notes.trim();
+
+  // Build the source description based on what's provided
+  let sourceDescription;
+  if (hasNotes && hasFiles) {
+    sourceDescription = 'the following class notes AND the attached files (images, documents, etc.)';
+  } else if (hasFiles) {
+    sourceDescription = 'the attached files (images, documents, etc.)';
+  } else {
+    sourceDescription = 'the following class notes';
+  }
+
+  let prompt = `You are an expert educational quiz generator. Generate exactly ${count} quiz questions based ONLY on ${sourceDescription}. Do NOT make up information that is not in the provided content.
 
 ${typeInstruction}
 
 Difficulty level: ${difficulty}
+`;
 
+  if (hasNotes) {
+    prompt += `
 CLASS NOTES:
 """
 ${notes}
 """
+`;
+  }
 
+  if (hasFiles) {
+    prompt += `
+ATTACHED FILES: ${files.length} file(s) have been attached. Carefully analyze ALL content in these files (text, diagrams, charts, tables, formulas, etc.) and use them to generate questions.
+`;
+  }
+
+  prompt += `
 RULES:
-- Only use information from the provided notes
+- Only use information from the provided content (notes and/or attached files)
 - Generate clear, well-formed questions
 - For multiple_choice: provide exactly 4 answer choices
 - IMPORTANT: Some multiple choice questions CAN have multiple correct answers. When a question naturally has multiple correct answers (e.g., "Which of the following are true?", "Select all that apply"), set is_multi_select to true and put ALL correct answers in the correct_answers array.
@@ -84,7 +119,25 @@ Return a JSON array of objects with this exact schema:
 
 Return ONLY the JSON array, no other text.`;
 
-  const questions = await callGemini(prompt);
+  // Build multimodal content parts
+  const parts = [];
+
+  // Add file parts first (so Gemini sees them before the prompt)
+  if (hasFiles) {
+    for (const file of files) {
+      parts.push({
+        inlineData: {
+          mimeType: file.mimeType,
+          data: file.data, // base64-encoded
+        },
+      });
+    }
+  }
+
+  // Add the text prompt
+  parts.push({ text: prompt });
+
+  const questions = await callGemini(parts);
 
   // Validate structure
   if (!Array.isArray(questions)) {
