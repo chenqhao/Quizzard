@@ -154,6 +154,9 @@ export default function ReviewPage() {
                     )}
                   </div>
                   <p className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>{q.question_text}</p>
+                  {q.question_image_url && (
+                    <img src={q.question_image_url} alt="Question" className="mt-2 max-h-32 rounded-lg object-contain" style={{ background: 'var(--muted)' }} />
+                  )}
                 </div>
                 <button
                   onClick={() => toggleAnswer(q.id)}
@@ -171,13 +174,18 @@ export default function ReviewPage() {
                       {q.choices.map((c, ci) => {
                         const correctAnswers = q.correct_answer ? q.correct_answer.split('|||').map(a => a.trim()) : [];
                         const isCorrect = correctAnswers.includes(c);
+                        const choiceImage = q.answer_images?.[String(ci)];
                         return (
                           <div key={ci} className="text-xs px-3 py-1.5 rounded-lg" style={{
                             background: isCorrect ? 'color-mix(in srgb, var(--success) 10%, transparent)' : 'var(--muted)',
                             color: isCorrect ? 'var(--success)' : 'var(--muted-foreground)',
                             fontWeight: isCorrect ? '600' : '400',
                           }}>
-                            {String.fromCharCode(65 + ci)}. {c} {isCorrect && <Check weight="bold" className="inline ml-1" />}
+                            <div className="flex items-center gap-2">
+                              <span>{String.fromCharCode(65 + ci)}. {c}</span>
+                              {choiceImage && <img src={choiceImage} alt={`Choice ${String.fromCharCode(65 + ci)}`} className="w-8 h-8 object-cover rounded border ml-auto" style={{ borderColor: 'var(--border)' }} />}
+                              {isCorrect && <Check weight="bold" className="inline ml-1" />}
+                            </div>
                           </div>
                         );
                       })}

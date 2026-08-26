@@ -268,9 +268,15 @@ export default function ActiveQuizPage({ params }) {
           <DifficultyBadge difficulty={currentQ.difficulty} />
         </div>
 
-        <h2 className="text-xl font-bold mb-6" style={{ color: 'var(--foreground)' }}>
+        <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--foreground)' }}>
           {currentQ.question_text}
         </h2>
+
+        {currentQ.question_image_url && (
+          <div className="mb-6 rounded-xl overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
+            <img src={currentQ.question_image_url} alt="Question" className="w-full max-h-72 object-contain" style={{ background: 'var(--muted)' }} />
+          </div>
+        )}
 
         {currentQ.type === 'multiple_choice' ? (
           <div className="space-y-3">
@@ -330,8 +336,11 @@ export default function ActiveQuizPage({ params }) {
                     ) : (
                       <span className="font-bold" style={{ color: 'var(--muted-foreground)' }}>{String.fromCharCode(65 + ci)}.</span>
                     )}
-                    {choice}
+                    <span className="flex-1">{choice}</span>
                   </span>
+                  {currentQ.answer_images?.[String(ci)] && (
+                    <img src={currentQ.answer_images[String(ci)]} alt={`Choice ${String.fromCharCode(65 + ci)}`} className="mt-2 max-h-32 rounded-lg object-contain ml-8" style={{ background: 'var(--muted)' }} />
+                  )}
                 </button>
               );
             })}

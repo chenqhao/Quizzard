@@ -340,6 +340,12 @@ export default function QuizResultsPage({ params }) {
                       {i + 1}. {q.question_text}
                     </p>
 
+                    {q.question_image_url && (
+                      <div className="mb-3 rounded-xl overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
+                        <img src={q.question_image_url} alt="Question" className="w-full max-h-48 object-contain" style={{ background: 'var(--muted)' }} />
+                      </div>
+                    )}
+
                     {/* MC choices */}
                     {q.type === 'multiple_choice' && q.choices && (
                       <div className="space-y-1.5 mb-3">
@@ -375,7 +381,10 @@ export default function QuizResultsPage({ params }) {
                               fontWeight: weight,
                             }}>
                               <span>{String.fromCharCode(65 + ci)}.</span>
-                              <span>{choice}</span>
+                              <span className="flex-1">{choice}</span>
+                              {q.answer_images?.[String(ci)] && (
+                                <img src={q.answer_images[String(ci)]} alt={`Choice ${String.fromCharCode(65 + ci)}`} className="w-10 h-10 object-cover rounded border" style={{ borderColor: 'var(--border)' }} />
+                              )}
                               {isCorrectChoice && <span className="ml-auto flex items-center gap-1"><Check weight="bold" /> Correct</span>}
                               {isUserChoice && !isCorrectChoice && <span className="ml-auto flex items-center gap-1"><X weight="bold" /> Your answer</span>}
                             </div>

@@ -112,6 +112,8 @@ function GeneratePageContent() {
         difficulty: q.difficulty,
         created_by: 'ai',
         is_multi_select: q.is_multi_select || false,
+        question_image_url: null,
+        answer_images: null,
       }));
 
     const { error } = await supabase.from('questions').insert(toSave);

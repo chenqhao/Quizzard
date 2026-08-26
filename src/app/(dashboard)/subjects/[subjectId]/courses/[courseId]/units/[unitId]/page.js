@@ -6,6 +6,7 @@ import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { Badge, DifficultyBadge, TypeBadge, MasteryBadge } from '@/components/ui/Badge';
+import ImageUpload from '@/components/ui/ImageUpload';
 import Link from 'next/link';
 import { SmileySad } from '@phosphor-icons/react/dist/ssr/SmileySad';
 import { Target } from '@phosphor-icons/react/dist/ssr/Target';
@@ -28,8 +29,8 @@ export default function UnitDetailPage({ params }) {
   const [expandedQ, setExpandedQ] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const emptyMC = { type: 'multiple_choice', question_text: '', choices: ['', '', '', ''], correct_answers: [], explanation: '', difficulty: 'medium', is_multi_select: false };
-  const emptyWritten = { type: 'written', question_text: '', correct_answer: '', explanation: '', difficulty: 'medium' };
+  const emptyMC = { type: 'multiple_choice', question_text: '', choices: ['', '', '', ''], correct_answers: [], explanation: '', difficulty: 'medium', is_multi_select: false, question_image_url: null, answer_images: {} };
+  const emptyWritten = { type: 'written', question_text: '', correct_answer: '', explanation: '', difficulty: 'medium', question_image_url: null, answer_images: {} };
   const [form, setForm] = useState(emptyMC);
 
   useEffect(() => { loadData(); }, [unitId]);
@@ -60,6 +61,8 @@ export default function UnitDetailPage({ params }) {
         explanation: question.explanation || '',
         difficulty: question.difficulty,
         is_multi_select: question.is_multi_select || false,
+        question_image_url: question.question_image_url || null,
+        answer_images: question.answer_images || {},
       });
     } else {
       setEditingQuestion(null);
@@ -76,6 +79,16 @@ export default function UnitDetailPage({ params }) {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
 
+    // Clean answer_images: only keep entries that have URLs and valid indices
+    let cleanAnswerImages = null;
+    if (form.answer_images && Object.keys(form.answer_images).length > 0) {
+      const filtered = {};
+      for (const [key, url] of Object.entries(form.answer_images)) {
+        if (url) filtered[key] = url;
+      }
+      if (Object.keys(filtered).length > 0) cleanAnswerImages = filtered;
+    }
+
     const payload = {
       type: form.type,
       question_text: form.question_text.trim(),
@@ -84,6 +97,8 @@ export default function UnitDetailPage({ params }) {
       explanation: form.explanation?.trim() || null,
       difficulty: form.difficulty,
       is_multi_select: form.type === 'multiple_choice' ? form.is_multi_select : false,
+      question_image_url: form.question_image_url || null,
+      answer_images: cleanAnswerImages,
     };
 
     let error = null;
@@ -194,6 +209,9 @@ export default function UnitDetailPage({ params }) {
                 <span className="text-sm font-bold mt-0.5 flex-shrink-0" style={{ color: 'var(--muted-foreground)' }}>{i + 1}.</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>{q.question_text}</p>
+                  {q.question_image_url && (
+                    <img src={q.question_image_url} alt="Question" className="mt-2 max-h-24 rounded-lg object-contain" style={{ background: 'var(--muted)' }} />
+                  )}
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
                     <TypeBadge type={q.type} />
                     <DifficultyBadge difficulty={q.difficulty} />
@@ -211,17 +229,23 @@ export default function UnitDetailPage({ params }) {
                   {q.type === 'multiple_choice' && q.choices && (
                     <div className="space-y-2">
                       <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted-foreground)' }}>Choices</p>
-                      {q.choices.map((choice, ci) => (
-                        <div key={ci} className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{
-                          background: choice === q.correct_answer ? 'color-mix(in srgb, var(--success) 10%, transparent)' : 'var(--muted)',
-                          color: choice === q.correct_answer ? 'var(--success)' : 'var(--foreground)',
-                          fontWeight: choice === q.correct_answer ? '600' : '400',
-                        }}>
-                          <span>{String.fromCharCode(65 + ci)}.</span>
-                          <span>{choice}</span>
-                          {choice === q.correct_answer && <span className="ml-auto flex items-center"><Check weight="bold" /></span>}
-                        </div>
-                      ))}
+                      {q.choices.map((choice, ci) => {
+                        const correctAnswers = q.correct_answer ? q.correct_answer.split('|||').map(a => a.trim()) : [];
+                        const isCorrect = correctAnswers.includes(choice);
+                        const choiceImage = q.answer_images?.[String(ci)];
+                        return (
+                          <div key={ci} className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{
+                            background: isCorrect ? 'color-mix(in srgb, var(--success) 10%, transparent)' : 'var(--muted)',
+                            color: isCorrect ? 'var(--success)' : 'var(--foreground)',
+                            fontWeight: isCorrect ? '600' : '400',
+                          }}>
+                            <span>{String.fromCharCode(65 + ci)}.</span>
+                            <span className="flex-1">{choice}</span>
+                            {choiceImage && <img src={choiceImage} alt={`Choice ${String.fromCharCode(65 + ci)}`} className="w-12 h-12 object-cover rounded-lg border" style={{ borderColor: 'var(--border)' }} />}
+                            {isCorrect && <span className="ml-auto flex items-center"><Check weight="bold" /></span>}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                   {q.type === 'written' && (
@@ -283,6 +307,14 @@ export default function UnitDetailPage({ params }) {
             <textarea id="question-text-input" value={form.question_text} onChange={(e) => setForm({ ...form, question_text: e.target.value })} placeholder="Enter your question..." rows={3} className="w-full px-4 py-3 rounded-xl border text-sm outline-none resize-none" style={{ background: 'var(--muted)', borderColor: 'var(--border)', color: 'var(--foreground)' }} autoFocus />
           </div>
 
+          {/* Question Image */}
+          <ImageUpload
+            imageUrl={form.question_image_url}
+            onUpload={(url) => setForm({ ...form, question_image_url: url })}
+            onRemove={() => setForm({ ...form, question_image_url: null })}
+            label="Question Image (optional)"
+          />
+
           {form.type === 'multiple_choice' ? (
             <>
               <div className="flex items-center gap-2 mb-2 p-3 rounded-xl border transition-all" style={{ background: 'var(--muted)', borderColor: 'var(--border)' }}>
@@ -292,7 +324,7 @@ export default function UnitDetailPage({ params }) {
               
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>Answer Choices</label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {form.choices.map((choice, ci) => (
                     <div key={ci} className="flex items-center gap-2">
                       <input 
@@ -329,6 +361,17 @@ export default function UnitDetailPage({ params }) {
                         placeholder={`Option ${String.fromCharCode(65 + ci)}`} 
                         className="flex-1 px-3 py-2 rounded-lg border text-sm outline-none transition-colors" 
                         style={{ background: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} 
+                      />
+                      <ImageUpload
+                        compact
+                        imageUrl={form.answer_images?.[String(ci)] || null}
+                        onUpload={(url) => setForm({ ...form, answer_images: { ...form.answer_images, [String(ci)]: url } })}
+                        onRemove={() => {
+                          const updated = { ...form.answer_images };
+                          delete updated[String(ci)];
+                          setForm({ ...form, answer_images: updated });
+                        }}
+                        label={`Option ${String.fromCharCode(65 + ci)} image`}
                       />
                     </div>
                   ))}
